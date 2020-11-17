@@ -16,19 +16,24 @@ def read_times(filename):
     return times
 
 if __name__ == '__main__':
-    (_, old_file, new_file) = sys.argv
-    old_times = read_times(old_file)
+    (_, reference_file, new_file, speedup_file) = sys.argv
+    reference_times = read_times(reference_file)
     new_times = read_times(new_file)
-    for test_name, time in old_times.items():
-        new_time = new_times[test_name]
-        speedup_string = test_name + ': '
+    with open(speedup_file) as f:
+        expected_speedup = float(f.read().strip())
 
-        mean_speedup = math.expm1(time['mean_log'] - new_time['mean_log'])
-        speedup_string += str(abs(mean_speedup * 100)) + '%'
-        speedup_string += ' faster' if mean_speedup > 0 else ' slower'
+    ((test_name, new_time),) = new_times.items()
+    time = reference_times[test_name]
+    mean_speedup = math.expm1(time['mean_log'] - new_time['mean_log'])
+    speedup_percent = abs(mean_speedup * 100)
+    speedup_direction = 'fast' if mean_speedup > 0 else 'slow'
+    variance_log_sum = time['variance_log'] + new_time['variance_log']
+    variance_percent = math.expm1(math.sqrt(variance_log_sum)) * 100
+    print(f'{test_name} ran {speedup_percent}% {speedup_direction}er than reference solution (+/- {variance_percent}%)')
 
-        variance_log_sum = time['variance_log'] + new_time['variance_log']
-        variance_speedup = math.expm1(math.sqrt(variance_log_sum))
-        speedup_string += ' (+/- ' + str(variance_speedup * 100) + ' %)'
-
-        print(speedup_string)
+    print(f'Expected speedup: {expected_speedup * 100}% faster')
+    if mean_speedup < expected_speedup:
+        print('Make it faster!')
+        sys.exit(1)
+    else:
+        print("That's fast!")

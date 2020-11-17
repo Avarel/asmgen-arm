@@ -20,7 +20,6 @@ typedef struct {
  * Attempt to fold the node as a constant value.
  */
 constant_fold_result_t constant_fold(node_t *node) {
-    // return (constant_fold_result_t){.present = false, .value = 0};
     switch (node->type) {
         case NUM: {
             num_node_t *n = (num_node_t *) node;

@@ -72,6 +72,7 @@ void print_int(value_t value) {
         "movk x15, #0x07DE, lsl #32\n"
         "movk x15, #0xB426, lsl #48\n"
         :
+        :
         : "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12",
           "x13", "x14", "x15");
 }

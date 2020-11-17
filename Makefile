@@ -1,6 +1,7 @@
-CC = clang-with-asan
+CC = clang
 CFLAGS = -Iinclude -Wall -Wextra -fno-sanitize=integer
 ASM = clang
+FLAGS = -target aarch64-linux-gnu -static -march=armv8-a
 
 COMPILE_TESTS_1 =                    $(sort $(wildcard progs/stage1-*.bas))
 COMPILE_TESTS_2 = $(COMPILE_TESTS_1) $(sort $(wildcard progs/stage2-*.bas))
@@ -26,25 +27,24 @@ compile7: $(COMPILE_TESTS_7:progs/%.bas=%-result)
 
 opt1: $(OPT_TESTS_1:=-bench)
 opt2: $(OPT_TESTS_2:=-bench)
-opt3: $(OPT_TESTS_3:=-bench)
 
 out/%.o: src/%.c
-	$(CC) $(CFLAGS) -c $^ -o $@
+	$(CC) $(CFLAGS) $(FLAGS) -c $^ -o $@
 
 out/%.o: runtime/%.c
-	$(ASM) $(CFLAGS) -O3 -c $^ -o $@
+	$(ASM) $(CFLAGS) $(FLAGS) -O3 -c $^ -o $@
 
 bin/compiler: out/ast.o out/compile.o out/compiler.o out/parser.o out/locals.o out/reg_alloc.o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $(FLAGS) $^ -o $@
 
 out/%.s: progs/%.bas bin/compiler
 	bin/compiler $< > $@
 
 bin/%: out/%.s out/print_int.o runtime/call_check.s
-	$(ASM) -g -nostartfiles $^ -o $@
+	$(ASM) $(FLAGS) -g $^ -o $@
 
 bin/time-%: out/%.s out/print_int_mock.o out/timing.o
-	$(ASM) -lm $^ -o $@
+	$(ASM) $(FLAGS) $^ -lm -o $@
 
 progs/%-expected.txt: progs/%.bas
 	grep '^#' $^ | sed -e 's/#//' > $@
@@ -58,14 +58,7 @@ progs/%-actual.txt: bin/%
 		|| (echo FAILED test $(@F:-result=). Aborting.; false)
 
 progs/%-time.csv: bin/time-%
-	$^ | grep -v test_name > $@
-
-progs/times.csv: $(COMPILE_TESTS_7:.bas=-time.csv)
-	echo test_name,mean_log_duration,variance_log_duration > $@
-	cat $^ >> $@
-
-times: compare_times.py reference-times.csv progs/times.csv
-	./$^
+	$^ > $@
 
 %-bench: compare_times.py reference-times.csv progs/%-time.csv progs/%-speedup.txt
 	./$^

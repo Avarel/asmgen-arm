@@ -8,8 +8,8 @@ check_failed_msg:
     .asciz "ARM64 calling convention violated\n"
 
 .text
-.globl _start
-_start:
+.globl main
+main:
     # # Put 32 KB of canary data on the stack
     # movq $-0x1000, %rcx
     # leaq (%rsp, %rcx, 8), %rsp
@@ -20,49 +20,128 @@ _start:
     # rep stosq
 
     # Put canary values in callee-save registers
-    mov r19, #0xB42607DE9FA358C1
-    mov r20, #0x412087E6FAB9C53D
-    mov r21, #0x514D387C6AE02B9F
-    mov r22, #0xE5BF4238C1DA9760
-    mov r23, #0xCB9FD8524A630E71
-    mov r24, #0xD0B5F947CEA23618
-    mov r25, #0xB42607DE9FA358C1
-    mov r26, #0x412087E6FAB9C53D
-    mov r27, #0x514D387C6AE02B9F
-    mov r28, #0xE5BF4238C1DA9760
+    movz x19, #0x58C1
+    movk x19, #0x9FA3, lsl #16
+    movk x19, #0x07DE, lsl #32
+    movk x19, #0xB426, lsl #48
 
-    call basic_main
+    movz x20, #0xC53D
+    movk x20, #0xFAB9, lsl #16
+    movk x20, #0x87E6, lsl #32
+    movk x20, #0x4120, lsl #48
+
+    movz x21, #0x2B9F
+    movk x21, #0x6AE0, lsl #16
+    movk x21, #0x387C, lsl #32
+    movk x21, #0x514D, lsl #48
+
+    movz x22, #0x9760
+    movk x22, #0xC1DA, lsl #16
+    movk x22, #0x4238, lsl #32
+    movk x22, #0xE5BF, lsl #48
+
+    movz x23, #0x0E71
+    movk x23, #0x4A63, lsl #16
+    movk x23, #0xD852, lsl #32
+    movk x23, #0xCB9F, lsl #48
+
+    movz x24, #0x3618
+    movk x24, #0xCEA2, lsl #16
+    movk x24, #0xF947, lsl #32
+    movk x24, #0xD0B5, lsl #48
+
+    movz x25, #0x58C1
+    movk x25, #0x9FA3, lsl #16
+    movk x25, #0x07DE, lsl #32
+    movk x25, #0xB426, lsl #48
+
+    movz x26, #0xC53D
+    movk x26, #0xFAB9, lsl #16
+    movk x26, #0x87E6, lsl #32
+    movk x26, #0x4120, lsl #48
+
+    movz x27, #0x2B9F
+    movk x27, #0x6AE0, lsl #16
+    movk x27, #0x387C, lsl #32
+    movk x27, #0x514D, lsl #48
+
+    movz x28, #0x9760
+    movk x28, #0xC1DA, lsl #16
+    movk x28, #0x4238, lsl #32
+    movk x28, #0xE5BF, lsl #48
+
+    bl basic_main
 
     # Check that callee-save registers haven't changed
-    mov x0, #0xB42607DE9FA358C1
+    movz x0, #0x58C1
+    movk x0, #0x9FA3, lsl #16
+    movk x0, #0x07DE, lsl #32
+    movk x0, #0xB426, lsl #48
     cmp x0, x19
     bne check_failed
-    mov x0, #0x412087E6FAB9C53D
+
+    movz x0, #0xC53D
+    movk x0, #0xFAB9, lsl #16
+    movk x0, #0x87E6, lsl #32
+    movk x0, #0x4120, lsl #48
     cmp x0, x20
     bne check_failed
-    mov x0, #0x514D387C6AE02B9F
+
+    movz x0, #0x2B9F
+    movk x0, #0x6AE0, lsl #16
+    movk x0, #0x387C, lsl #32
+    movk x0, #0x514D, lsl #48
     cmp x0, x21
     bne check_failed
-    mov x0, #0xE5BF4238C1DA9760
+
+    movz x0, #0x9760
+    movk x0, #0xC1DA, lsl #16
+    movk x0, #0x4238, lsl #32
+    movk x0, #0xE5BF, lsl #48
     cmp x0, x22
     bne check_failed
-    mov x0, #0xCB9FD8524A630E71
+
+    movz x0, #0x0E71
+    movk x0, #0x4A63, lsl #16
+    movk x0, #0xD852, lsl #32
+    movk x0, #0xCB9F, lsl #48
     cmp x0, x23
     bne check_failed
-    mov x0, #0xD0B5F947CEA23618
+
+    movz x0, #0x3618
+    movk x0, #0xCEA2, lsl #16
+    movk x0, #0xF947, lsl #32
+    movk x0, #0xD0B5, lsl #48
     cmp x0, x24
     bne check_failed
-    mov x0, #0xB42607DE9FA358C1
+
+    movz x0, #0x58C1
+    movk x0, #0x9FA3, lsl #16
+    movk x0, #0x07DE, lsl #32
+    movk x0, #0xB426, lsl #48
     cmp x0, x25
     bne check_failed
-    mov x0, #0x412087E6FAB9C53D
+
+    movz x0, #0xC53D
+    movk x0, #0xFAB9, lsl #16
+    movk x0, #0x87E6, lsl #32
+    movk x0, #0x4120, lsl #48
     cmp x0, x26
     bne check_failed
-    mov x0, #0x514D387C6AE02B9F
+
+    movz x0, #0x2B9F
+    movk x0, #0x6AE0, lsl #16
+    movk x0, #0x387C, lsl #32
+    movk x0, #0x514D, lsl #48
     cmp x0, x27
     bne check_failed
-    mov x0, #0xE5BF4238C1DA9760
+
+    movz x0, #0x9760
+    movk x0, #0xC1DA, lsl #16
+    movk x0, #0x4238, lsl #32
+    movk x0, #0xE5BF, lsl #48
     cmp x0, x28
+    bne check_failed
 
     # # Check canary values on stack
     # movq %rsp, %rdi
@@ -72,15 +151,17 @@ _start:
     # jne check_failed
 
     # Checks succeeded; exit with code 0
-    movl w0, wzr
+    mov w0, wzr
     bl exit
 
     # # Checks failed; print a warning message and exit with error status
     check_failed:
-    adrp    x8, stderr
-    ldr     x3, [x8, :lo12:stderr]
-    adrp    x0, check_failed_msg
-    add     x0, x0, :lo12:check_failed_msg
-    mov     w1, #34
-    mov     w2, #1
-    b       fwrite
+    adrp x8, stderr
+    ldr x3, [x8, :lo12:stderr]
+    adrp x0, check_failed_msg
+    add x0, x0, :lo12:check_failed_msg
+    mov w1, #34
+    mov w2, #1
+    bl fwrite
+    mov w0, #1
+    bl exit

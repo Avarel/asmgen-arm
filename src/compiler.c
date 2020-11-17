@@ -31,22 +31,15 @@ void header(uint32_t locals_size) {
         "\n"
         "# The code section of the assembly file\n"
         ".text\n"
-        "    print_int:\n"
-        "    adrp x8, intfmt\n"
-        "    add x8, x8, :lo12:intfmt\n"
-        "    mov x1, x0\n"
-        "    mov x0, x8\n"
-        "    b printf\n"
-        "\n"
-        ".globl main\n"
-        "main:\n"
+        ".globl basic_main\n"
+        "basic_main:\n"
         "    # The main() function\n"
         "    stp fp, lr, [sp, #-16]!\n"
         "    mov fp, sp\n");
 
     // Using 16 byte stack slots for simplicity
     uint32_t n = locals_size > LOCALS_REG_SIZE ? LOCALS_REG_SIZE : locals_size;
-    if (n > 0) {
+    if (locals_size > 0) {
         printf("    sub sp, sp, #%#x\n", round_up(locals_size * 8, 16));
     }
     for (uint32_t i = 0; i < n; i++) {
@@ -64,7 +57,7 @@ void footer(uint32_t locals_size) {
     for (uint32_t i = 0; i < n; i++) {
         printf("    ldr %s, [fp, #-%#x]\n", LOCALS_REG[i], (i + 1) * 8);
     }
-    if (n + locals_size > 0) {
+    if (locals_size > 0) {
         printf("    add sp, sp, #%#x\n", round_up(locals_size * 8, 16));
     }
 
